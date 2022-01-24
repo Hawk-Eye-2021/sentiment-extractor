@@ -3,7 +3,7 @@
 yum -y update
 yum -y install git
 git clone https://github.com/Hawk-Eye-2021/sentiment-extractor.git
-cd content-processor
+cd sentiment-extractor
 
 # add swap
 dd if=/dev/zero of=/var/swap.1 bs=1M count=8192
