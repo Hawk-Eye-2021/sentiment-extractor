@@ -1,28 +1,33 @@
-from pysentimiento import create_analyzer
-from pysentimiento.preprocessing import preprocess_tweet
+from googletrans import Translator
+import aspect_based_sentiment_analysis as absa
 
+nlp = None
+translator = None
 
-analyzer = None
+sentiment_map = {
+    absa.Sentiment.neutral: "neutral",
+    absa.Sentiment.negative: "negative",
+    absa.Sentiment.positive: "positive"
+}
 
 
 def init_classifier():
-    global analyzer
-    analyzer = create_analyzer(task="sentiment", lang="es")
+    global nlp
+    global translator
+    translator = Translator()
+    nlp = absa.load()
 
 
-def analyse_sentence(sentence, is_from_twitter):
-    aux_sentence = sentence
+def analyse_sentence(extraction):
 
-    if is_from_twitter:
-        aux_sentence = preprocess_tweet(sentence)
-    prediction = analyzer.predict(aux_sentence)
-    output = prediction.output
+    global sentiment_map
 
-    if output == 'NEG':
-        return 'negative'
-    if output == 'NEU':
-        return 'neutral'
-    if output == 'POS':
-        return 'positive'
+    print(extraction)
+    translation = {"title": extraction['title'], "translation": translator.translate(extraction['title'], dest='en').text, "entities": extraction['entities']}
+    analysis = nlp(translation['translation'], aspects=translation['entities'])
 
-    return prediction.output
+    sentiments = {}
+    for entity in translation['entities']:
+        sentiments[entity] = sentiment_map[analysis[entity].sentiment]
+
+    return {"title": translation['title'], "entities": translation['entities'], "sentiments": sentiments}

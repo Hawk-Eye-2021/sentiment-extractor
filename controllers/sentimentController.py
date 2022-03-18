@@ -8,9 +8,8 @@ from sentiment_analysis import analyse_sentence
 class SentimentController(Resource):
 
     def post(self):
-        request_json = request.get_json(force=True, cache=False)
-        sentence = request_json['sentence']
-        is_from_twitter = request_json['twitter']
-        analysis = analyse_sentence(sentence, is_from_twitter)
+        request_json = request.get_json()
+        extraction = request_json['extraction']
+        analysis = analyse_sentence(extraction)
 
         return analysis
